@@ -1,0 +1,23 @@
+{
+    "name": "tsamino",
+    "version": "1.2.4",
+    "description": "TypeScript library for easy access to the AminoApps API",
+    "author": "IlyaDreamix",
+    "license": "MIT",
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "build": "npx tsc",
+        "npma": "npm run build && npm publish",
+        "npmb": "npm publish"
+    },
+    "devDependencies": {
+        "@types/node": "^18.8.5",
+        "node-fetch": "^3.2.10"
+    },
+    "dependencies": {
+        "@types/node": "^18.8.5",
+        "node-fetch": "^3.2.10"
+    }
+}
