@@ -1,14 +1,17 @@
-import fetch, {
-    HeadersInit,
-    RequestInit
-} from "node-fetch";
-
-import {Client} from "./client.js";
-import {RequestParams} from "./model.js";
-import {TemporaryBanError} from "./errors.js";
+import fetch from "node-fetch";
+import { HeadersInit, RequestInit } from "node-fetch";
+// ---
+import { Client } from "./client.js";
+import { RequestParams } from "./model.js";
+import { TemporaryBanError } from "./errors.js";
+// ---
 import * as Util from "./util.js";
 import * as Const from "./const.js";
 
+/**
+ * Class representing AminoApps API request builder
+ * @description Request class is used inside the Client class. It helps to build the API request
+ */
 export class Request {
     static readonly API_GLOBAL = "https://service.narvii.com/api/v1/g";
     static readonly API_NDC = "https://service.narvii.com/api/v1/x";
@@ -20,8 +23,8 @@ export class Request {
     private client: Client;
 
     /**
-     * Class representing AminoApps API request builder
-     * @description Request class is used inside the Client class. It helps to build the API request
+     * @param client Amino Client
+     * @see Client
      */
     constructor(client: Client) {
         this.client = client;

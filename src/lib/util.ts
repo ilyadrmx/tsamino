@@ -1,4 +1,4 @@
-import {randomBytes, createHmac} from "crypto";
+import { randomBytes, createHmac } from "crypto";
 
 const PREFIX_HEX = Buffer.from("42", "hex");
 const DEVICE_KEY = Buffer.from("02B258C63559D8804321C5D5065AF320358D366F", "hex");

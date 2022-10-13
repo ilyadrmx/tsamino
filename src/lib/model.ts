@@ -6,18 +6,18 @@ export interface RequestParams {
 }
 
 export interface LoginWithEmail {
-    email: string,
-    secret: string,
-    clientType: number,
-    deviceID: string,
-    action: string,
-    timestamp: number
+    email: string;
+    secret: string;
+    clientType: number;
+    deviceID: string;
+    action: string;
+    timestamp: number;
 }
 
 export interface BasicResponse {
-    "api:message"?: string,
-    "api:duration": string,
-    "api:timestamp": string,
+    "api:message"?: string;
+    "api:duration": string;
+    "api:timestamp": string;
     "api:statuscode": number;
 }
 
@@ -33,7 +33,7 @@ export interface Account {
     aminoIdEditable: boolean;
     aminoId: string;
     createdTime: string;
-    extensions: Extensions
+    extensions: Extensions;
     email: string;
 }
 

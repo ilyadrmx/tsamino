@@ -1,9 +1,14 @@
-import {Request} from "./request.js";
 import * as Models from "./model.js";
 import * as Util from "./util.js";
 import * as Const from "./const.js";
-import {AminoAppsError} from "./errors.js";
+// ---
+import { Request } from "./request.js";
+import { AminoAppsError } from "./errors.js";
 
+/**
+ * Class representing AminoApps API client
+ * @description Main library class that provides and executes calls to the AminoApps API
+ */
 export class Client {
     // Client's device ID used in "NDCDEVICEID" header
     deviceId: string | null;
@@ -31,12 +36,10 @@ export class Client {
     request: Request;
 
     /**
-     * Class representing AminoApps API client
-     * @description Main library class that provides and executes calls to the AminoApps API
      * @param deviceId Client's device ID used in "NDCDEVICEID" header
      * @param debug Debug requests
      */
-    constructor(deviceId: string = Util.generateDeviceId(), debug: boolean = false) {
+    constructor(deviceId: string | null = Util.generateDeviceId(), debug: boolean = false) {
         this.deviceId = deviceId;
         this.sid = null;
         this.debug = debug;
@@ -75,6 +78,11 @@ export class Client {
                 "Email login error",
                 textResponse
             );
+
+        const loginResponse: Models.LoginResponse = JSON.parse(textResponse);
+
+        this.sid = loginResponse.sid;
+        this.request = new Request(this);
 
         return JSON.parse(textResponse);
     }
