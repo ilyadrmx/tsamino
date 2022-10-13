@@ -15,7 +15,7 @@ export function generateDeviceId(data: string | null = null) {
 }
 
 /** Generate signature for JSON data */
-export function generateSigFromJson(data: string) {
+export function generateSigFromString(data: string) {
     let bufferData = Buffer.from(data, "utf8");
 
     let mac = createHmac("sha1", SIG_KEY)

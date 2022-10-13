@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
-import { HeadersInit, RequestInit } from "node-fetch";
+import { HeadersInit, RequestInit, Response } from "node-fetch";
 // ---
-import { Client } from "./client.js";
+import { Client } from "../client.js";
 import { RequestParams } from "./model.js";
 import { TemporaryBanError } from "./errors.js";
 // ---
@@ -11,19 +11,22 @@ import * as Const from "./const.js";
 /**
  * Class representing AminoApps API request builder
  * @description Request class is used inside the Client class. It helps to build the API request
+ * @property {Client} client Amino client
+ * @see Client
  */
 export class Request {
-    static readonly API_GLOBAL = "https://service.narvii.com/api/v1/g";
-    static readonly API_NDC = "https://service.narvii.com/api/v1/x";
-    static readonly NDC_GLOBAL = 0;
-
-    static readonly DEFAULT_METHOD = "GET";
-    static readonly METHOD_POST = "POST";
-
+    // Amino client
     private client: Client;
 
+    public static readonly API_GLOBAL = "https://service.narvii.com/api/v1/g";
+    public static readonly API_NDC = "https://service.narvii.com/api/v1/x";
+    public static readonly NDC_GLOBAL = 0;
+
+    public static readonly DEFAULT_METHOD = "GET";
+    public static readonly METHOD_POST = "POST";
+
     /**
-     * @param client Amino Client
+     * @param {Client} client Amino Client
      * @see Client
      */
     constructor(client: Client) {
@@ -32,9 +35,12 @@ export class Request {
 
     /**
      * Make an HTTP request from params
-     * @description
+     * @param {string} path AminoApps service path
+     * @param {RequestParams} params Request parameters
+     * @return {Response} Response
+     * @see RequestParams
      */
-    async call(path: string, params: RequestParams) {
+    public async call(path: string, params: RequestParams): Promise<Response> {
         // Default request params
         let fetchParams: RequestInit = {
             method: Request.DEFAULT_METHOD
@@ -61,7 +67,7 @@ export class Request {
         if (params.data)
             switch (params.contentType) {
                 case Request.HeaderValues.CONTENT_TYPE_APPLICATION_JSON:
-                    requestHeaders[Request.HeaderNames.NDC_MSG_SIG] = Util.generateSigFromJson(params.data);
+                    requestHeaders[Request.HeaderNames.NDC_MSG_SIG] = Util.generateSigFromString(params.data);
                     fetchParams.body = params.data;
                     break;
                 default:
@@ -107,7 +113,8 @@ export class Request {
         return response;
     }
 
-    static HeaderNames = class {
+    /** AminoApps API headers names*/
+    public static HeaderNames = class {
         static readonly NDC_DEVICE_ID = "NDCDeviceId";
         static readonly NDC_MSG_SIG = "NDC-MSG-SIG";
         static readonly NDC_AUTH = "NDCAuth";
@@ -115,10 +122,17 @@ export class Request {
         static readonly CONTENT_TYPE = "Content-Type";
     }
 
-    static HeaderValues = class {
+    /** AminoApps API default headers values */
+    public static HeaderValues = class {
         static readonly CONTENT_TYPE_APPLICATION_JSON = "application/json";
     }
 
+    /**
+     * Get URL path from ndc ID
+     * @param {number} ndcId Ndc ID
+     * @return {string} Path
+     * @private
+     */
     private getPathFromNdcId(ndcId: number) {
         if (ndcId == Request.NDC_GLOBAL)
             return Request.API_GLOBAL + "/s";
