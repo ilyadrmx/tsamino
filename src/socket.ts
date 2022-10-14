@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { EventEmitter } from "events";
 // ---
-import {Client} from "./client.js";
+import { Client } from "./client.js";
 import { AminoAppsError } from "./lib/errors.js";
 // ---
 import * as Util from "./lib/util.js";
@@ -32,6 +32,15 @@ export class Socket extends EventEmitter {
         this.client = client;
     }
 
+    /** Stop listening */
+    public stop() {
+        this.ws.removeAllListeners();
+
+        // Debug
+        if (this.client.debug)
+            console.log("[DEBUG] Websocket stopped");
+    }
+
     /** Start listening */
     public start() {
         const data = this.getConnectionData();
@@ -42,6 +51,10 @@ export class Socket extends EventEmitter {
         this.commands = [];
 
         this.setCallbacks();
+
+        // Debug
+        if (this.client.debug)
+            console.log("[DEBUG] Websocket started");
     }
 
     /**
@@ -102,18 +115,6 @@ export class Socket extends EventEmitter {
             switch (struct.t) {
                 // Default chat message
                 case Const.SocketMessageTypes.CHAT:
-                    // Check if message type is 0 (default)
-                    if (struct.o.chatMessage.type == Const.ChatMessageTypes.DEFAULT) {
-                        // Emit text message
-                        this.emit("textMessage", struct.o);
-
-                        // Emit command
-                        this.commands.forEach(value => {
-                            if (struct.o.chatMessage.content?.startsWith(value.command))
-                                this.emit(value.command, struct.o);
-                        });
-                    }
-
                     // Set reply function
                     struct.o.chatMessage.reply = async (
                         text,
@@ -136,12 +137,24 @@ export class Socket extends EventEmitter {
                         return message;
                     }
 
+                    // Check if message type is 0 (default)
+                    if (struct.o.chatMessage.type == Const.ChatMessageTypes.DEFAULT) {
+                        // Emit text message
+                        this.emit("textMessage", struct.o);
+
+                        // Emit command
+                        this.commands.forEach(value => {
+                            if (struct.o.chatMessage.content?.startsWith(value.command))
+                                this.emit(value.command, struct.o);
+                        });
+                    }
+
                     // Emit chat message
                     this.emit("chatMessage", struct.o);
             }
 
             // Emit websocket event
-            this.emit("websocketEvent", struct.o);
+            this.emit("websocketEvent", struct);
         });
     }
 

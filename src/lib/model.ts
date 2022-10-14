@@ -3,6 +3,8 @@ export interface RequestParams {
     ndcId: number;
     contentType?: string;
     data?: any;
+    withNot200Error?: boolean;
+    not200Text?: string;
 }
 
 export interface LoginWithEmail {
@@ -173,8 +175,8 @@ export interface MessageExtensions {
 }
 
 export interface MessageParams {
-    text: string | null;
     threadId: string;
+    text: string | null;
     replyTo: string | null;
     mentionedArray: MentionedArray[] | null;
     type: number | null;
@@ -197,4 +199,179 @@ export type SocketCallback = (message: SocketO) => void;
 export interface SocketCommands {
     command: string;
     callback: SocketCallback;
+}
+
+export interface Thread {
+    userAddedTopicList: ThreadUserAddedTopicList[];
+    uid: string;
+    membersQuota: number;
+    membersSummary: ThreadMembersSummary[];
+    threadId: string;
+    membersCount: number;
+    strategyInfo: string;
+    isPinned: boolean;
+    title: string;
+    tipInfo: ThreadTipInfo;
+    membershipStatus: number;
+    content: string;
+    needHidden: boolean;
+    alertOption: number;
+    lastReadTime: string;
+    type: number;
+    status: number;
+    publishToGlobal: number;
+    lastMessageSummary: ThreadLastMessageSummary;
+    condition: number;
+    icon: string;
+    latestActivityTime: string;
+    author: Author;
+    extensions: ThreadExtensions;
+    ndcId: number;
+}
+
+export interface ThreadUserAddedTopicList {
+    status: number;
+    isOfficial: boolean;
+    style: ThreadStyle;
+    isAlias: boolean;
+    name: string;
+    contentPoolId: string;
+    topicId: number;
+    advancedCommunityStatus: number;
+    increaseId: number;
+    visibility: number;
+    source: number;
+    chatStatus: number;
+    scope: number;
+    advancedStatus: number;
+    isLocked: boolean;
+    objectMappingScore: number;
+    coverImage?: string;
+    storyId?: string;
+}
+
+export interface ThreadStyle {
+    backgroundColor: string;
+}
+
+export interface ThreadMembersSummary {
+    status: number;
+    uid: string;
+    membershipStatus: number;
+    role: number;
+    nickname: string;
+    icon: string;
+}
+
+export interface ThreadTipInfo {
+    tipOptionList: ThreadTipOptionList[];
+    tipMaxCoin: number;
+    tippersCount: number;
+    tippable: boolean;
+    tipMinCoin: number;
+    tipCustomOption: ThreadTipCustomOption;
+    tippedCoins: number;
+}
+
+export interface ThreadTipOptionList {
+    value: number;
+    icon: string;
+}
+
+export interface ThreadTipCustomOption {
+    icon: string;
+}
+
+export interface ThreadLastMessageSummary {
+    uid: string;
+    type: number;
+    mediaType: number;
+    content: any;
+    messageId: string;
+    createdTime: string;
+    isHidden: boolean;
+    mediaValue: string;
+}
+
+export interface Author {
+    status: number;
+    isNicknameVerified: boolean;
+    uid: string;
+    level: number;
+    followingStatus: number;
+    accountMembershipStatus: number;
+    isGlobal: boolean;
+    membershipStatus: number;
+    avatarFrameId: string;
+    reputation: number;
+    role: number;
+    avatarFrame: AvatarFrame;
+    ndcId: number;
+    membersCount: number;
+    nickname: string;
+    icon: string;
+}
+
+export interface AvatarFrame {
+    status: number;
+    version: number;
+    resourceUrl: string;
+    name: string;
+    icon: string;
+    frameType: number;
+    frameId: string;
+}
+
+export interface ThreadExtensions {
+    announcement: string;
+    coHost: string[];
+    language: string;
+    membersCanInvite: boolean;
+    screeningRoomPermission: ThreadScreeningRoomPermission;
+    bm: [number, string, any];
+    avchatMemberUidList: string[];
+    visibility: number;
+    bannedMemberUidList: string[];
+    lastMembersSummaryUpdateTime: number;
+    fansOnly: boolean;
+    channelType: number;
+    pinAnnouncement: boolean;
+    vvChatJoinType: number;
+    viewOnly: boolean;
+}
+
+export interface ThreadScreeningRoomPermission {
+    action: number;
+    uidList: string[];
+}
+
+export interface ThreadResponse extends BasicResponse {
+    thread: Thread;
+}
+
+export interface ThreadsResponse extends BasicResponse {
+    threadList: Thread[];
+}
+
+export interface SidInfo {
+    "1": any;
+    "0": number;
+    "3": number;
+    /** UID */ "2": string;
+    /** Timestamp */ "5": number;
+    /** IP */ "4": string;
+    /** Client type */ "6": number;
+}
+
+export interface UserProfileResponse extends BasicResponse {
+    userProfile: UserProfile;
+}
+
+export interface AccountResponse extends BasicResponse {
+    account: Account;
+}
+
+export interface ClientParams {
+    deviceId?: string | null;
+    debug?: boolean;
 }

@@ -2,8 +2,8 @@ import fetch from "node-fetch";
 import { HeadersInit, RequestInit, Response } from "node-fetch";
 // ---
 import { Client } from "../client.js";
-import { RequestParams } from "./model.js";
-import { TemporaryBanError } from "./errors.js";
+import { RequestParams, BasicResponse } from "./model.js";
+import { AminoAppsError, TemporaryBanError } from "./errors.js";
 // ---
 import * as Util from "./util.js";
 import * as Const from "./const.js";
@@ -90,6 +90,16 @@ export class Request {
         if (statusCode == Const.StatusCodes.FORBIDDEN)
             throw new TemporaryBanError(await response.text());
 
+        // Throw if response status is not 200
+        if (params.withNot200Error) {
+            if (statusCode != Const.StatusCodes.SUCCESS_HTTP) {
+                const textResponse = await response.text();
+                const basicResponse: BasicResponse = JSON.parse(textResponse);
+
+                throw new AminoAppsError(basicResponse["api:message"], params.not200Text, textResponse);
+            }
+        }
+
         // Debug
         if (this.client.debug) {
             const headersEntries = Object.entries(requestHeaders);
@@ -102,12 +112,12 @@ export class Request {
                 headersText += "        " + entry[0] + ": " + entry[1] + stringEnd;
             });
 
-            console.log(`${params.method} ${path} --->`);
+            console.log(`[DEBUG] Request - ${params.method} ${path} --->`);
             console.log(`    NDC ID: ${params.ndcId}`);
             console.log(`    Content type: ${params.contentType}`);
             console.log(`    Body: ${params.data}`);
             console.log(`    Headers: ${headersText}`);
-            console.log(`<--- Status ${statusCode}\n`);
+            console.log(`<--- Status ${statusCode}`);
         }
 
         return response;

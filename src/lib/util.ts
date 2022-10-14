@@ -1,4 +1,5 @@
 import { randomBytes, createHmac } from "crypto";
+import * as Models from "./model.js";
 
 const PREFIX_HEX = Buffer.from("42", "hex");
 const DEVICE_KEY = Buffer.from("02B258C63559D8804321C5D5065AF320358D366F", "hex");
@@ -32,4 +33,13 @@ export function generateSigFromBuffer(data: Buffer) {
         .digest("hex");
 
     return Buffer.from("42" + mac, "hex").toString("base64");
+}
+
+/** Get data from session ID */
+export function decodeSid(sid: string): Models.SidInfo {
+    const decodedB64 = Buffer.from(sid + "=".repeat(4 - sid.length % 4), "base64url");
+    let str = decodedB64.toString("utf8");
+    str = str.slice(1, str.indexOf("0}") + 2);
+
+    return JSON.parse(str);
 }

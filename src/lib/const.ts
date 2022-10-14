@@ -2,6 +2,7 @@
 export class StatusCodes {
     static readonly SUCCESS = 0;
     static readonly FORBIDDEN = 403;
+    static readonly SUCCESS_HTTP = 200;
 }
 
 /** AminoApps websocket message types */
