@@ -1,6 +1,6 @@
 {
     "name": "tsamino",
-    "version": "1.3.25",
+    "version": "1.3.32",
     "description": "TypeScript library for easy access to the AminoApps API",
     "author": "IlyaDreamix",
     "license": "MIT",
@@ -9,8 +9,8 @@
     "types": "./dist/index.d.ts",
     "scripts": {
         "build": "npx tsc",
-        "build-and-publish": "npm run build && npm publish",
-        "publish-built": "npm publish"
+        "build-and-publish": "npm run build && npm publish && rmdir \"dist\" /s /q",
+        "publish-built": "npm publish && rmdir \"dist\" /s /q"
     },
     "devDependencies": {
         "typescript": "^4.8.4"

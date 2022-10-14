@@ -5,3 +5,4 @@ example
 tsconfig.json
 .gitignore
 src
+out

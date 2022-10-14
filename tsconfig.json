@@ -13,6 +13,7 @@
     ],
     "include": [
         "src/index.ts",
-        "src/lib/**.js"
+        "src/lib/**.js",
+        "src/lib/models/**.js"
     ]
 }

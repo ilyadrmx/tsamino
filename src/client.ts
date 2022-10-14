@@ -202,6 +202,28 @@ export class Client {
     \*-----------------*/
 
     /**
+     * Get community information
+     * @param {string} ndcId Community ID
+     * @return {Promise<Models.community.Community>} Community information
+     */
+    public async getCommunityInfo(ndcId: number | string): Promise<Models.community.Community> {
+        ndcId = typeof ndcId == "string"
+            ? -(parseInt(ndcId))
+            : -ndcId;
+
+        const response = await this.request.call(
+            `/community/info?withInfluencerList=1&withTopicList=true&influencerListOrderStrategy=fansCount`, {
+                method: Request.DEFAULT_METHOD,
+                ndcId: ndcId,
+                withNot200Error: true,
+                not200Text: "Get community info error"
+            }
+        );
+
+        return JSON.parse(await response.text());
+    }
+
+    /**
      * Get account info
      * @return {Promise<Models.AccountResponse>} Account info
      */
@@ -210,7 +232,7 @@ export class Client {
             method: Request.DEFAULT_METHOD,
             ndcId: this.ndcId,
             withNot200Error: true,
-            not200Text: "Get account error"
+            not200Text: "Get account info error"
         });
 
         return JSON.parse(await response.text());

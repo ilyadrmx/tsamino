@@ -1,3 +1,5 @@
+import * as community from "./models/community.js";
+
 export interface RequestParams {
     method?: string;
     ndcId: number;
@@ -106,6 +108,8 @@ export interface SocketO {
     chatMessage: ChatMessage;
     alertOption: number;
     membershipStatus: number;
+    reply: (text: string, mentionedArray: MentionedArray[] | null, type: number)
+        => Promise<ChatMessage>;
 }
 
 export interface ChatMessage {
@@ -123,8 +127,6 @@ export interface ChatMessage {
     chatBubbleId: string;
     chatBubbleVersion: number;
     extensions: MessageExtensions;
-    reply: (text: string, mentionedArray: MentionedArray[] | null, type: number)
-        => Promise<ChatMessage>;
 }
 
 export interface Author {
@@ -232,7 +234,7 @@ export interface Thread {
 export interface ThreadUserAddedTopicList {
     status: number;
     isOfficial: boolean;
-    style: ThreadStyle;
+    style: Style;
     isAlias: boolean;
     name: string;
     contentPoolId: string;
@@ -250,7 +252,7 @@ export interface ThreadUserAddedTopicList {
     storyId?: string;
 }
 
-export interface ThreadStyle {
+export interface Style {
     backgroundColor: string;
 }
 
@@ -375,3 +377,5 @@ export interface ClientParams {
     deviceId?: string | null;
     debug?: boolean;
 }
+
+export { community }

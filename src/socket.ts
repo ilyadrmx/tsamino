@@ -116,7 +116,7 @@ export class Socket extends EventEmitter {
                 // Default chat message
                 case Const.SocketMessageTypes.CHAT:
                     // Set reply function
-                    struct.o.chatMessage.reply = async (
+                    struct.o.reply = async (
                         text,
                         mentionedArray = null,
                         type = 0

@@ -84,21 +84,8 @@ export class Request {
             fetchParams
         );
 
-        // Check 403 Forbidden
+        // Get status code
         const statusCode = response.status;
-
-        if (statusCode == Const.StatusCodes.FORBIDDEN)
-            throw new TemporaryBanError(await response.text());
-
-        // Throw if response status is not 200
-        if (params.withNot200Error) {
-            if (statusCode != Const.StatusCodes.SUCCESS_HTTP) {
-                const textResponse = await response.text();
-                const basicResponse: BasicResponse = JSON.parse(textResponse);
-
-                throw new AminoAppsError(basicResponse["api:message"], params.not200Text, textResponse);
-            }
-        }
 
         // Debug
         if (this.client.debug) {
@@ -113,11 +100,26 @@ export class Request {
             });
 
             console.log(`[DEBUG] Request - ${params.method} ${path} --->`);
+            console.log(`    Full URL: ${this.getPathFromNdcId(params.ndcId) + path}`);
             console.log(`    NDC ID: ${params.ndcId}`);
             console.log(`    Content type: ${params.contentType}`);
             console.log(`    Body: ${params.data}`);
             console.log(`    Headers: ${headersText}`);
             console.log(`<--- Status ${statusCode}`);
+        }
+
+        // Check 403 Forbidden
+        if (statusCode == Const.StatusCodes.FORBIDDEN)
+            throw new TemporaryBanError(await response.text());
+
+        // Throw if response status is not 200
+        if (params.withNot200Error) {
+            if (statusCode != Const.StatusCodes.SUCCESS_HTTP) {
+                const textResponse = await response.text();
+                const basicResponse: BasicResponse = JSON.parse(textResponse);
+
+                throw new AminoAppsError(basicResponse["api:message"], params.not200Text, textResponse);
+            }
         }
 
         return response;
@@ -149,6 +151,6 @@ export class Request {
         else if (ndcId > Request.NDC_GLOBAL)
             return Request.API_NDC + ndcId.toString() + "/s";
 
-        return Request.API_GLOBAL + `s-x${Math.abs(ndcId)}`;
+        return Request.API_GLOBAL + `/s-x${Math.abs(ndcId)}`;
     }
 }
