@@ -15,9 +15,9 @@ export class AminoAppsError extends Error {
     response: string | null;
 
     /**
-     * @param {string} message Err
-     * @param {string} name
-     * @param {string | null} response
+     * @param {string} message Error message
+     * @param {string} name Error name
+     * @param {string | null} [response=null] Error response
      */
     constructor(message: string, name: string, response: string | null = null) {
         super(message);

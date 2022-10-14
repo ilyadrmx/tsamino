@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: socket.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: socket.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import WebSocket from "ws";
+import { EventEmitter } from "events";
+import { AminoAppsError } from "./lib/errors.js";
+// ---
+import * as Util from "./lib/util.js";
+import * as Const from "./lib/const.js";
+/**
+ * Class representing AminoApps API websocket client
+ * @description Class that helps to receive and send websocket messages to AminoApps API
+ * @property {Client} client Amino client
+ * @property {WebSocket} ws Amino websocket
+ * @property {Models.SocketCommands} commands Client commands
+ */
+export class Socket extends EventEmitter {
+    /**
+     * @param {Client} client Amino client
+     * @see Client
+     */
+    constructor(client) {
+        super();
+        this.client = client;
+    }
+    /** Stop listening */
+    stop() {
+        this.ws.removeAllListeners();
+        // Debug
+        if (this.client.debug)
+            console.log("[DEBUG] Websocket stopped");
+    }
+    /** Start listening */
+    start() {
+        const data = this.getConnectionData();
+        this.ws = new WebSocket(data.url, {
+            headers: data.headers
+        });
+        this.commands = [];
+        this.setCallbacks();
+        // Debug
+        if (this.client.debug)
+            console.log("[DEBUG] Websocket started");
+    }
+    /**
+     * Send websocket message
+     * @param {string | any} data Data to send
+     */
+    send(data) {
+        // TODO: Callback
+        this.ws.send(JSON.stringify(data));
+    }
+    /** Set websocket callbacks */
+    setCallbacks() {
+        this.ws.on("open", () => {
+            // Debug
+            if (this.client.debug)
+                console.log("[DEBUG] Connected to websocket");
+            // Reconnect after 120s
+            setInterval(() => {
+                // Debug
+                if (this.client.debug)
+                    console.log("[DEBUG] Websocket reconnect (120s timeout)");
+                // Reconnect
+                that.reconnect();
+            }, 120000);
+        });
+        const that = this;
+        this.ws.on("close", (code, reason) => {
+            // Debug
+            if (this.client.debug)
+                console.log("[DEBUG] Websocket connection closed." + " " +
+                    `Trying to reconnect (${code}: ${reason.toString("utf-8")})`);
+            // Reconnect
+            setTimeout(() => {
+                that.reconnect();
+            }, 1000);
+        });
+        this.ws.on("error", (error) => {
+            // Debug
+            if (this.client.debug)
+                console.log(`[DEBUG] Websocket error (${error})`);
+            process.exit(-1);
+        });
+        this.ws.on("message", (message) => {
+            const textMessage = message.toString("utf-8");
+            const struct = JSON.parse(textMessage);
+            switch (struct.t) {
+                // Default chat message
+                case Const.SocketMessageTypes.CHAT:
+                    // Set reply function
+                    struct.o.chatMessage.reply = async (text, mentionedArray = null, type = 0) => {
+                        const oldNdcId = this.client.ndcId;
+                        const newNdc = this.client.setNdc(struct.o.ndcId);
+                        const message = await newNdc.sendMessage({
+                            text: text,
+                            threadId: struct.o.chatMessage.threadId,
+                            replyTo: struct.o.chatMessage.messageId,
+                            mentionedArray: mentionedArray,
+                            type: type
+                        });
+                        this.client.setNdc(oldNdcId);
+                        return message;
+                    };
+                    // Check if message type is 0 (default)
+                    if (struct.o.chatMessage.type == Const.ChatMessageTypes.DEFAULT) {
+                        // Emit text message
+                        this.emit("textMessage", struct.o);
+                        // Emit command
+                        this.commands.forEach(value => {
+                            var _a;
+                            if ((_a = struct.o.chatMessage.content) === null || _a === void 0 ? void 0 : _a.startsWith(value.command))
+                                this.emit(value.command, struct.o);
+                        });
+                    }
+                    // Emit chat message
+                    this.emit("chatMessage", struct.o);
+            }
+            // Emit websocket event
+            this.emit("websocketEvent", struct);
+        });
+    }
+    /**
+     * Get data for websocket connection
+     * @private
+     * @return {Models.SocketConnectionData} Websocket connection data
+     */
+    getConnectionData() {
+        if (!this.client.sid)
+            throw new AminoAppsError("Please login to your account", "Unauthorized");
+        // Connection body
+        const body = this.client.deviceId + "|" + new Date().getTime().toString();
+        // Connection headers
+        const headers = {
+            NDCDEVICEID: this.client.deviceId,
+            NDCAUTH: "sid=" + this.client.sid,
+            "NDC-MSG-SIG": Util.generateSigFromString(body)
+        };
+        // Connection URL
+        const url = `${Socket.WS_URL}/?signbody=${body.replace("|", "%7C")}`;
+        return {
+            body: body,
+            headers: headers,
+            url: url
+        };
+    }
+    /**
+     * Reconnect websocket
+     * @private
+     */
+    reconnect() {
+        this.ws.removeAllListeners();
+        this.start();
+    }
+}
+Socket.WS_URL = "wss://ws3.narvii.com";
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Client.html">Client</a></li><li><a href="Socket.html">Socket</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.11</a> on Fri Oct 14 2022 13:56:26 GMT+0300 (Восточная Европа, летнее время)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
